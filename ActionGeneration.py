@@ -40,6 +40,7 @@ def create_tensors(params):
 
 
 def generate_action():
+    print('start')
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if not pexists('./Data'):
         os.mkdir('./Data')
