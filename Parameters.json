@@ -9,6 +9,6 @@
     "STEPS_NUM": 500,
     "EPOCHS_NUM": 10000,
     "RHO_FUNCTION" : "ReLU",
-    "CONTROLLER_DIRECTORY": ".\\Models",
-    "META_CONTROLLER_DIRECTORY": ".\\Models"
+    "CONTROLLER_DIRECTORY": "./Models",
+    "META_CONTROLLER_DIRECTORY": "./Models"
 }
