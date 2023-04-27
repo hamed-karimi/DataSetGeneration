@@ -40,6 +40,7 @@ def create_tensors(params):
 
 
 def generate_action():
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if not pexists('./Data'):
         os.mkdir('./Data')
 
@@ -49,8 +50,8 @@ def generate_action():
     res_folder = utility.make_res_folder()
 
     environment_initialization_prob_map = np.ones(params.HEIGHT * params.WIDTH) * 100 / (params.HEIGHT * params.WIDTH)
-    meta_controller = factory.get_meta_controller()
-    controller = factory.get_controller()
+    meta_controller = factory.get_meta_controller().to(device)
+    controller = factory.get_controller().to(device)
 
     print_threshold = 1
     visualizer = Visualizer(utility)
@@ -68,7 +69,7 @@ def generate_action():
 
             batch_environments_ll.append(environment.env_map.clone())
             batch_needs_ll.append(agent.need.clone())
-            batch_selected_goals_ll.append(goal_index.clone())
+            batch_selected_goals_ll.append(goal_index.cpu().clone())
 
             if epoch < print_threshold:
                 fig, ax = visualizer.map_to_image(agent, environment)
@@ -76,10 +77,10 @@ def generate_action():
                 plt.close()
 
             agent_goal_map = torch.stack([environment.env_map[0, 0, :, :],
-                                          goal_map], dim=0).unsqueeze(0).clone()
+                                          goal_map.cpu()], dim=0).unsqueeze(0).to(device)
             action_id = controller.get_action(agent_goal_map, environment.get_action_mask())
-            _, _ = agent.take_action(environment, action_id)
-            at_step_goal_reached = agent_reached_goal(environment, goal_index)
+            _, _ = agent.take_action(environment, action_id.cpu())
+            at_step_goal_reached = agent_reached_goal(environment, goal_index.cpu())
             goal_reached[epoch, step] = at_step_goal_reached
 
             batch_actions_ll.append(action_id.clone())
