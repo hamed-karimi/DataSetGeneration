@@ -1,0 +1,14 @@
+{
+    "HEIGHT" : 4,
+    "WIDTH" : 4,
+    "OBJECT_NUM": 2,
+    "REWARD_OF_OBJECT": 10.0,
+    "PROB_OF_FAR_OBJECTS_FOR_TWO": 0.5,
+    "PROB_OF_INIT_NEEDS_EQUAL": 0.2,
+    "CONTROLLER_TRAINING_PHASE": false,
+    "STEPS_NUM": 500,
+    "EPOCHS_NUM": 10000,
+    "RHO_FUNCTION" : "ReLU",
+    "CONTROLLER_DIRECTORY": ".\\Models",
+    "META_CONTROLLER_DIRECTORY": ".\\Models"
+}
