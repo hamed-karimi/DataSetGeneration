@@ -6,8 +6,8 @@ import numpy as np
 
 
 class Utilities:
-    def __init__(self, json_file_path):
-        with open(json_file_path, 'r') as json_file:
+    def __init__(self):
+        with open('./Parameters.json', 'r') as json_file:
             self.params = json.load(json_file,
                                     object_hook=lambda d: SimpleNamespace(**d))
 

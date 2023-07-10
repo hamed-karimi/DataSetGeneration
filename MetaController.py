@@ -30,11 +30,9 @@ class MetaController:
 
         # stay
         if ind == environment.object_locations.shape[0]:
-            goal_map = environment.env_map[0, 0, :, :].clone()  # agent map as goal map
+            goal_map = environment.env_map[:, 0, :, :].clone()  # agent map as goal map
             return goal_map, ind.unsqueeze(0)
 
         # goal
-        selected_obj_location = environment.object_locations[ind, :]
-        goal_map = torch.zeros((environment.height, environment.width), dtype=torch.float32)
-        goal_map[selected_obj_location[0], selected_obj_location[1]] = 1
+        goal_map = environment.env_map[:, ind+1, :, :]
         return goal_map, ind.unsqueeze(0)

@@ -76,9 +76,8 @@ class Visualizer:
     def map_to_image(self, agent, environment):
 
         agent_location = environment.agent_location
-        objects_location = np.zeros((environment.nObj, 2))
-        for i in range(objects_location.shape[0]):
-            objects_location[i, :] = np.nonzero(environment.env_map[0, i+1, :, :])
+        objects_location = environment.object_locations
+
         fig, ax = plt.subplots(figsize=(15, 10))
         arrows_x = np.zeros((self.height, self.width))
         arrows_y = np.zeros((self.height, self.width))
@@ -91,8 +90,11 @@ class Visualizer:
         ax.set_xticks([])
         ax.set_yticks([])
         ax.invert_yaxis()
-        for i in range(objects_location.shape[0]):
-            ax.scatter(objects_location[i, 1], objects_location[i, 0], marker='*', s=500, facecolor=self.color_options[i])
+        for obj_type in range(objects_location.shape[0]):
+            for obj in range(environment.each_type_object_num[obj_type]):
+                ax.scatter(objects_location[obj_type, obj, 1],
+                           objects_location[obj_type, obj, 0],
+                           marker='*', s=500, facecolor=self.color_options[obj_type])
         ax.set_box_aspect(aspect=1)
 
         ax.scatter(agent_location[0, 1], agent_location[0, 0], s=380, facecolors='b', edgecolors='k')

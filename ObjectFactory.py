@@ -14,24 +14,29 @@ class ObjectFactory:
         self.meta_controller = None
         self.params = utility.get_params()
 
-    def get_agent(self, need_num):
-        agent = Agent(self.params.HEIGHT, self.params.WIDTH,
-                      n=need_num,
+    def get_agent(self, pre_location, preassigned_needs):
+        agent = Agent(self.params.HEIGHT, self.params.WIDTH, n=self.params.OBJECT_TYPE_NUM,
                       prob_init_needs_equal=self.params.PROB_OF_INIT_NEEDS_EQUAL,
-                      rho_function=self.params.RHO_FUNCTION)
+                      predefined_location=pre_location,
+                      preassigned_needs=preassigned_needs)
         self.agent = agent
         return agent
 
-    def get_environment(self, probability_map, num_object):
-        env = Environment(self.params.HEIGHT, self.params.WIDTH, self.agent, probability_map,
-                          reward_of_object=self.params.REWARD_OF_OBJECT,
-                          far_objects_prob=self.params.PROB_OF_FAR_OBJECTS_FOR_TWO,
-                          num_object=num_object)
-        self.environment = env
-        return env
+    def get_environment(self, few_many, probability_map, pre_located_objects_num, pre_located_objects_location,
+                        random_new_object_type, random_new_object):  # pre_located_objects is a 2D list
+        environment = Environment(few_many, self.params.HEIGHT, self.params.WIDTH, self.agent, probability_map,
+                                  reward_of_object=self.params.REWARD_OF_OBJECT,
+                                  far_objects_prob=self.params.PROB_OF_FAR_OBJECTS_FOR_TWO,
+                                  num_object=self.params.OBJECT_TYPE_NUM,
+                                  pre_located_objects_num=pre_located_objects_num,
+                                  pre_located_objects_location=pre_located_objects_location,
+                                  random_new_object_type=random_new_object_type,
+                                  random_new_object=random_new_object)
+        self.environment = environment
+        return environment
 
     def get_controller(self):
-        controller = Controller(self.params.CONTROLLER_DIRECTORY)
+        controller = Controller(self.params.HEIGHT, self.params.WIDTH)
         self.controller = deepcopy(controller)
         return controller
 
