@@ -136,29 +136,6 @@ def generate_action():
 
             if n_step == params.STEPS_NUM:
                 break
-        # for step in range(params.STEPS_NUM):
-        #     goal_map, goal_index = meta_controller.get_goal_map(environment, agent)
-        #
-        #     batch_environments_ll.append(environment.env_map.clone())
-        #     batch_needs_ll.append(agent.need.clone())
-        #     batch_selected_goals_ll.append(goal_index.cpu().clone())
-        #
-        #     if epoch < print_threshold:
-        #         fig, ax = visualizer.map_to_image(agent, environment)
-        #         fig.savefig('{0}/epoch_{1}_step_{2}.png'.format(res_folder, epoch, step))
-        #         plt.close()
-        #
-        #     agent_goal_map = torch.stack([environment.env_map[0, 0, :, :],
-        #                                   goal_map.cpu()], dim=0).unsqueeze(0)
-        #     action_id = controller.get_action(agent_goal_map)
-        #     _, _ = agent.take_action(environment, action_id.cpu())
-        #     at_step_goal_reached = agent_reached_goal(environment, goal_index.cpu())
-        #     goal_reached[epoch, step] = at_step_goal_reached
-        #
-        #     batch_actions_ll.append(action_id.clone())
-        #
-        #     if at_step_goal_reached:
-        #         environment = factory.get_environment(environment_initialization_prob_map, num_object=2)
 
         environments[epoch, :, :, :, :] = torch.cat(batch_environments_ll, dim=0)
         needs[epoch, :, :] = torch.cat(batch_needs_ll, dim=0)
