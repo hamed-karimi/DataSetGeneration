@@ -64,8 +64,9 @@ class Environment:
 
         for obj_type in range(self.object_type_num):
             for at_obj in range(self.each_type_object_num[obj_type]):
-                if at_obj < len(pre_located_objects_location[obj_type]) and len(
-                        pre_located_objects_location[obj_type][at_obj]) > 0:
+                # if at_obj < len(pre_located_objects_location[obj_type]) and len(
+                #         pre_located_objects_location[obj_type][at_obj]) > 0:
+                if not torch.eq(self.object_locations[obj_type, at_obj], torch.tensor([-1, -1])).all():
                     self.object_locations[obj_type, at_obj, :] = torch.as_tensor(
                         pre_located_objects_location[obj_type][at_obj])
                     sample = self.object_locations[obj_type, at_obj, :]

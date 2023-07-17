@@ -35,19 +35,19 @@ def update_pre_located_objects(object_locations, agent_location, goal_reached):
 
 
 def create_tensors(params):
-    environments = torch.zeros((params.EPOCHS_NUM,
+    environments = torch.zeros((params.EPISODE_NUM,
                                 params.STEPS_NUM,
                                 params.OBJECT_TYPE_NUM + 1,
                                 params.HEIGHT,
                                 params.WIDTH), dtype=torch.float32)
-    needs = torch.zeros((params.EPOCHS_NUM,
+    needs = torch.zeros((params.EPISODE_NUM,
                          params.STEPS_NUM,
                          params.OBJECT_TYPE_NUM), dtype=torch.float32)
-    actions = torch.zeros((params.EPOCHS_NUM,
+    actions = torch.zeros((params.EPISODE_NUM,
                            params.STEPS_NUM), dtype=torch.int32)
-    selected_goals = torch.zeros((params.EPOCHS_NUM,
+    selected_goals = torch.zeros((params.EPISODE_NUM,
                                   params.STEPS_NUM), dtype=torch.int32)
-    goal_reached = torch.zeros((params.EPOCHS_NUM,
+    goal_reached = torch.zeros((params.EPISODE_NUM,
                                 params.STEPS_NUM), dtype=torch.bool)
 
     return environments, needs, actions, selected_goals, goal_reached
@@ -69,7 +69,7 @@ def generate_action():
     print_threshold = 2
     visualizer = Visualizer(utility)
     environments, needs, actions, selected_goals, goal_reached = create_tensors(params)
-    for epoch in range(params.EPOCHS_NUM):
+    for episode in range(params.EPISODE_NUM):
         batch_environments_ll = []
         batch_actions_ll = []
         batch_needs_ll = []
@@ -101,9 +101,9 @@ def generate_action():
                 batch_needs_ll.append(agent.need.clone())
                 batch_selected_goals_ll.append(goal_type.cpu().clone())
 
-                if epoch < print_threshold:
+                if episode < print_threshold:
                     fig, ax = visualizer.map_to_image(agent, environment)
-                    fig.savefig('{0}/epoch_{1}_goal_{2}_step_{3}.png'.format(res_folder, epoch, n_goal, n_step))
+                    fig.savefig('{0}/episode_{1}_goal_{2}_step_{3}.png'.format(res_folder, episode, n_goal, n_step))
                     plt.close()
 
                 agent_goal_map = torch.stack([environment.env_map[:, 0, :, :], goal_map], dim=1)
@@ -111,7 +111,7 @@ def generate_action():
                 agent.take_action(environment, action_id)
 
                 step_goal_reached = agent_reached_goal(environment, goal_type)
-                goal_reached[epoch, n_step] = step_goal_reached
+                goal_reached[episode, n_step] = step_goal_reached
 
                 batch_actions_ll.append(action_id.clone())
                 # all_actions += 1
@@ -137,13 +137,13 @@ def generate_action():
             if n_step == params.STEPS_NUM:
                 break
 
-        environments[epoch, :, :, :, :] = torch.cat(batch_environments_ll, dim=0)
-        needs[epoch, :, :] = torch.cat(batch_needs_ll, dim=0)
-        selected_goals[epoch, :] = torch.cat(batch_selected_goals_ll, dim=0)
-        actions[epoch, :] = torch.cat(batch_actions_ll, dim=0)
+        environments[episode, :, :, :, :] = torch.cat(batch_environments_ll, dim=0)
+        needs[episode, :, :] = torch.cat(batch_needs_ll, dim=0)
+        selected_goals[episode, :] = torch.cat(batch_selected_goals_ll, dim=0)
+        actions[episode, :] = torch.cat(batch_actions_ll, dim=0)
 
-        if epoch % 100 == 0:
-            print(epoch)
+        if episode % 100 == 0:
+            print(episode)
 
         # Saving to memory
 
