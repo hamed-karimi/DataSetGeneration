@@ -1,13 +1,13 @@
+import os
+from os.path import exists as pexists
+
+import matplotlib.pyplot as plt
+import numpy as np
 import torch
+
 from ObjectFactory import ObjectFactory
 from Utilities import Utilities
-import numpy as np
 from Visualizer import Visualizer
-import matplotlib.pyplot as plt
-import pickle
-from copy import deepcopy
-from os.path import exists as pexists
-import os
 
 
 def agent_reached_goal(environment, goal_index):
@@ -31,7 +31,7 @@ def update_pre_located_objects(object_locations, agent_location, goal_reached):
                 else:
                     temp.append([-1, -1])
             pre_located_objects.append(temp)
-    return pre_located_objects
+    return torch.tensor(pre_located_objects)
 
 
 def create_tensors(params):
@@ -75,7 +75,7 @@ def generate_action():
         batch_needs_ll = []
         batch_selected_goals_ll = []
         pre_located_objects_location = [[[]]] * params.OBJECT_TYPE_NUM
-        pre_located_objects_num = [] * params.OBJECT_TYPE_NUM
+        pre_located_objects_num = torch.zeros((params.OBJECT_TYPE_NUM, ), dtype=torch.int32)
         object_amount_options = ['few', 'many']
         episode_object_amount = [np.random.choice(object_amount_options) for _ in range(params.OBJECT_TYPE_NUM)]
 
@@ -145,8 +145,7 @@ def generate_action():
         if episode % 100 == 0:
             print(episode)
 
-        # Saving to memory
-
+    # Saving to memory
     torch.save(environments, './Data/environments.pt')
     torch.save(needs, './Data/needs.pt')
     torch.save(selected_goals, './Data/selected_goals.pt')

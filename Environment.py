@@ -63,14 +63,16 @@ class Environment:
             self.each_type_object_num, self.object_locations = self.get_each_object_type_num_of_appearance()
 
         for obj_type in range(self.object_type_num):
-            for at_obj in range(self.each_type_object_num[obj_type]):
-                # if at_obj < len(pre_located_objects_location[obj_type]) and len(
-                #         pre_located_objects_location[obj_type][at_obj]) > 0:
-                if not torch.eq(self.object_locations[obj_type, at_obj], torch.tensor([-1, -1])).all():
+            for at_obj in range(pre_located_objects_num[obj_type]):
+                # if at_obj < len(pre_located_objects_location[obj_type]) and len(pre_located_objects_location[obj_type][at_obj]) > 0:
+                if not torch.eq(pre_located_objects_location[obj_type, at_obj], torch.tensor([-1, -1])).all():
+                    # temp = self.object_locations.clone()
                     self.object_locations[obj_type, at_obj, :] = torch.as_tensor(
                         pre_located_objects_location[obj_type][at_obj])
                     sample = self.object_locations[obj_type, at_obj, :]
                     self.env_map[0, 1 + obj_type, sample[0], sample[1]] = 1
+                    # continue
+        # New objects
         for obj_type in range(self.object_type_num):
             for at_obj in range(self.each_type_object_num[obj_type]):
                 if torch.eq(self.object_locations[obj_type, at_obj], torch.tensor([-1, -1])).all():  # not pre-assigned
@@ -80,13 +82,12 @@ class Environment:
                         hw_range = np.arange(self.height * self.width)
                         rand_num_in_range = random.choices(hw_range, weights=self.probability_map, k=1)[0]
                         sample = torch.tensor([rand_num_in_range // self.width, rand_num_in_range % self.width])
-                        # This location is empty on every object layer as well as the pre-assigned objects
-                        if sum(self.env_map[0, 1:, sample[0], sample[1]]).item() == 0:
+                        if sum(self.env_map[0, 1:, sample[0], sample[
+                            1]]).item() == 0:  # This location is empty on every object layer as well as the pre-assigned objects
                             self.object_locations[obj_type, at_obj, :] = sample
                             self.env_map[0, 1 + obj_type, sample[0], sample[1]] = 1
                             # self.probability_map[rand_num_in_range] *= .9
                             do = 0
-        # return object_locations
 
     def init_two_objects_far_from_each_other(self):
         r = random.random()
