@@ -16,6 +16,7 @@ class ObjectFactory:
 
     def get_agent(self, pre_location, preassigned_needs):
         agent = Agent(self.params.HEIGHT, self.params.WIDTH, n=self.params.OBJECT_TYPE_NUM,
+                      agent_type=self.params.AGENT_TYPE,
                       prob_init_needs_equal=self.params.PROB_OF_INIT_NEEDS_EQUAL,
                       predefined_location=pre_location,
                       preassigned_needs=preassigned_needs)

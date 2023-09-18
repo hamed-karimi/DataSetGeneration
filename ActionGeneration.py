@@ -66,7 +66,7 @@ def generate_action():
     meta_controller = factory.get_meta_controller()
     controller = factory.get_controller()
 
-    print_threshold = 2
+    print_threshold = 3
     visualizer = Visualizer(utility)
     environments, needs, actions, selected_goals, goal_reached = create_tensors(params)
     for episode in range(params.EPISODE_NUM):
@@ -94,7 +94,8 @@ def generate_action():
             # environment_0 = deepcopy(environment)
             # agent_0 = deepcopy(agent)
             goal_map, goal_type = meta_controller.get_goal_map(environment,
-                                                               agent)  # goal type is either 0 or 1
+                                                               agent,
+                                                               controller=controller)  # goal type is either 0 or 1
             n_goal += 1
             while True:
                 batch_environments_ll.append(environment.env_map.clone())
@@ -146,8 +147,8 @@ def generate_action():
             print(episode)
 
     # Saving to memory
-    torch.save(environments, './Data/environments.pt')
-    torch.save(needs, './Data/needs.pt')
-    torch.save(selected_goals, './Data/selected_goals.pt')
-    torch.save(goal_reached, './Data/goal_reached.pt')
-    torch.save(actions, './Data/actions.pt')
+    torch.save(environments, './Data_{0}/environments.pt'.format(params.AGENT_TYPE))
+    torch.save(needs, './Data_{0}/needs.pt'.format(params.AGENT_TYPE))
+    torch.save(selected_goals, './Data_{0}/selected_goals.pt'.format(params.AGENT_TYPE))
+    torch.save(goal_reached, './Data_{0}/goal_reached.pt'.format(params.AGENT_TYPE))
+    torch.save(actions, './Data_{0}/actions.pt'.format(params.AGENT_TYPE))

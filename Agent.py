@@ -7,10 +7,12 @@ from itertools import product
 
 
 class Agent:
-    def __init__(self, h, w, n, prob_init_needs_equal, predefined_location, preassigned_needs):  # n: number of needs
+    def __init__(self, h, w, n, agent_type, prob_init_needs_equal, predefined_location, preassigned_needs):  # n: number of needs
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.height = h
         self.width = w
+        self.AGENT_TYPE_OPTIONS = ["Regular", "RandomNeeds", "NearestObject"]
+        self.agent_type = agent_type
         self.location = self.initial_location(predefined_location)
         self.num_need = n
         self.range_of_need = [-12, 12]
@@ -27,6 +29,10 @@ class Agent:
         self.total_need = self.get_total_need()
         possible_h_w = [list(range(h)), list(range(w))]
         self.all_locations = torch.from_numpy(np.array([element for element in product(*possible_h_w)]))
+        self.assert_agent_type()
+
+    def assert_agent_type(self):
+        assert self.agent_type in self.AGENT_TYPE_OPTIONS, f"'{self.agent_type}' is not in {self.AGENT_TYPE_OPTIONS}"
 
     def poly_relu(self, x, p=2):
         return self.relu(x) ** p
@@ -50,8 +56,11 @@ class Agent:
         return torch.from_numpy(np.asarray((np.random.randint(self.height), np.random.randint(self.width)))).unsqueeze(0)
 
     def update_need_after_step(self):
-        for i in range(self.num_need):
-            self.need[0, i] += self.lambda_need
+        if self.agent_type in ['Regular', 'NearestObject']:
+            for i in range(self.num_need):
+                self.need[0, i] += self.lambda_need
+        else:
+            self.need = self.set_need(preassigned_needs=[[]])
 
     def update_need_after_reward(self, reward):
         self.need = self.need - reward
