@@ -19,6 +19,18 @@ def agent_reached_goal(environment, goal_index):
     return False
 
 
+def agent_reached_object(environment):
+    agent_location_on_object_maps = environment.env_map[0, 1:,
+                                    environment.agent_location[0, 0].item(),
+                                    environment.agent_location[0, 1].item()]
+
+    reached_object = torch.argwhere(agent_location_on_object_maps).squeeze(dim=0)
+    if reached_object.numel() > 0:
+        return reached_object
+    else:
+        return torch.tensor([-1])
+
+
 def update_pre_located_objects(object_locations, agent_location, goal_reached):
     pre_located_objects = []
 
@@ -47,10 +59,12 @@ def create_tensors(params):
                            params.STEPS_NUM), dtype=torch.int32)
     selected_goals = torch.zeros((params.EPISODE_NUM,
                                   params.STEPS_NUM), dtype=torch.int32)
+    observed_goals = torch.zeros((params.EPISODE_NUM,
+                                  params.STEPS_NUM), dtype=torch.int32)
     goal_reached = torch.zeros((params.EPISODE_NUM,
                                 params.STEPS_NUM), dtype=torch.bool)
 
-    return environments, needs, actions, selected_goals, goal_reached
+    return environments, needs, actions, selected_goals, observed_goals, goal_reached
 
 
 def generate_action():
@@ -68,14 +82,16 @@ def generate_action():
 
     print_threshold = 3
     visualizer = Visualizer(utility)
-    environments, needs, actions, selected_goals, goal_reached = create_tensors(params)
+    environments, needs, actions, selected_goals, observed_goals, goal_reached = create_tensors(params)
     for episode in range(params.EPISODE_NUM):
         batch_environments_ll = []
         batch_actions_ll = []
         batch_needs_ll = []
         batch_selected_goals_ll = []
+        batch_observed_goals_ll = []
+
         pre_located_objects_location = [[[]]] * params.OBJECT_TYPE_NUM
-        pre_located_objects_num = torch.zeros((params.OBJECT_TYPE_NUM, ), dtype=torch.int32)
+        pre_located_objects_num = torch.zeros((params.OBJECT_TYPE_NUM,), dtype=torch.int32)
         object_amount_options = ['few', 'many']
         episode_object_amount = [np.random.choice(object_amount_options) for _ in range(params.OBJECT_TYPE_NUM)]
 
@@ -110,6 +126,9 @@ def generate_action():
                 agent_goal_map = torch.stack([environment.env_map[:, 0, :, :], goal_map], dim=1)
                 action_id = controller.get_action(agent_goal_map).clone()
                 agent.take_action(environment, action_id)
+
+                step_reached_object = goal_type if goal_type == params.OBJECT_TYPE_NUM else agent_reached_object(environment)
+                batch_observed_goals_ll.append(step_reached_object)  # could be -1 which means no reached object
 
                 step_goal_reached = agent_reached_goal(environment, goal_type)
                 goal_reached[episode, n_step] = step_goal_reached
