@@ -147,6 +147,9 @@ def generate_action():
             print(episode)
 
     # Saving to memory
+    if not os.path.exists('./Data_{0}'.format(params.AGENT_TYPE)):
+        os.mkdir('./Data_{0}'.format(params.AGENT_TYPE))
+
     torch.save(environments, './Data_{0}/environments.pt'.format(params.AGENT_TYPE))
     torch.save(needs, './Data_{0}/needs.pt'.format(params.AGENT_TYPE))
     torch.save(selected_goals, './Data_{0}/selected_goals.pt'.format(params.AGENT_TYPE))
