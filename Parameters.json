@@ -1,7 +1,7 @@
 {
     "HEIGHT" : 8,
     "WIDTH" : 8,
-    "AGENT_TYPE": "Regular",
+    "AGENT_TYPE": "NearestObject",
     "OBJECT_TYPE_NUM": 2,
     "REWARD_OF_OBJECT": 15.0,
     "DQN_CONV1_KERNEL": 8,
